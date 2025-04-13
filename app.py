@@ -18,7 +18,10 @@ from src.utils.config import setup_page
 from src.utils.data_loader import load_accident_data, get_weather_data
 
 # Import page modules
-from src.pages import home_page, accident_map_page, weather_page, report_page
+from src.pages import home_page, accident_map_page, weather_page, report_page, ml_predictions_page
+
+# Import components
+from src.components.emergency_services import display_emergency_banner
 
 # Set up the page configuration
 setup_page()
@@ -27,12 +30,15 @@ setup_page()
 if 'page' not in st.session_state:
     st.session_state.page = "Home"
 
+# Display emergency services banner at the top
+display_emergency_banner()
+
 # Sidebar navigation
 st.sidebar.title("Navigation")
 selected_page = st.sidebar.radio(
     "Go to",
-    ["Home", "Accident Map", "Weather & Alerts", "Report Issue"],
-    index=["Home", "Accident Map", "Weather & Alerts", "Report Issue"].index(st.session_state.page)
+    ["Home", "Accident Map", "Weather & Alerts", "ML Predictions", "Report Issue"],
+    index=["Home", "Accident Map", "Weather & Alerts", "ML Predictions", "Report Issue"].index(st.session_state.page if st.session_state.page in ["Home", "Accident Map", "Weather & Alerts", "ML Predictions", "Report Issue"] else "Home")
 )
 
 # Update session state
@@ -61,6 +67,8 @@ elif selected_page == "Accident Map":
     accident_map_page.render()
 elif selected_page == "Weather & Alerts":
     weather_page.render()
+elif selected_page == "ML Predictions":
+    ml_predictions_page.render()
 elif selected_page == "Report Issue":
     report_page.render()
 
