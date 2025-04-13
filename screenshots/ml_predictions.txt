@@ -1,0 +1,2 @@
+This is a placeholder for the ML predictions screenshot.
+In a real implementation, you would take a screenshot of the ML predictions page and save it as ml_predictions.png in this directory.

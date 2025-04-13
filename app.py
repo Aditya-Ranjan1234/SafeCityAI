@@ -76,8 +76,10 @@ elif selected_page == "Report Issue":
 st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: #666;'>"
-    "© 2023 Bangalore Accident Prevention System | "
-    "Developed for safer roads and communities"
+    "© 2025 Bangalore Accident Prevention System | "
+    "Developed for safer roads and communities | "
+    "Created for समAI - Time for AI | "
+    "Data updated: April 2025"
     "</div>",
     unsafe_allow_html=True
 )

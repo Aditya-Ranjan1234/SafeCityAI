@@ -1,0 +1,2 @@
+This is a placeholder for the emergency services screenshot.
+In a real implementation, you would take a screenshot of the emergency services component and save it as emergency_services.png in this directory.

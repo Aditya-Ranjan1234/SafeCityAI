@@ -1,0 +1,2 @@
+This is a placeholder for the accident map screenshot.
+In a real implementation, you would take a screenshot of the accident map page and save it as accident_map.png in this directory.

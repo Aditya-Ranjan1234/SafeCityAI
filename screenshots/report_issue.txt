@@ -1,0 +1,2 @@
+This is a placeholder for the report issue screenshot.
+In a real implementation, you would take a screenshot of the report issue page and save it as report_issue.png in this directory.
