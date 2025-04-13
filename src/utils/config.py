@@ -28,15 +28,17 @@ COLORS = {
     "warning": "#FF9800",      # Orange warning
     "success": "#4CAF50",      # Green success
     "info": "#2196F3",         # Info blue
-    "background": "#F9F9F9",   # Light background
-    "card": "#FFFFFF",         # Card background
-    "text": "#212121",         # Main text
-    "text_secondary": "#757575", # Secondary text
-    "border": "#E0E0E0",       # Border color
+    "background": "#1E1E2E",   # Dark background
+    "card": "#2A2A3C",         # Dark card background
+    "text": "#FFFFFF",         # White text for dark mode
+    "text_secondary": "#B0B0B0", # Light gray secondary text
+    "border": "#3A3A4C",       # Dark border color
     "hazard_high": "#FF5252",  # High hazard (red)
     "hazard_medium": "#FF9800", # Medium hazard (orange)
     "hazard_low": "#FFC107",   # Low hazard (yellow)
     "civic_blue": "#1976D2",   # Civic blue
+    "sidebar_bg": "#121212",   # Sidebar background
+    "sidebar_text": "#FFFFFF", # Sidebar text
 }
 
 # Custom CSS for styling the application
@@ -68,7 +70,7 @@ def load_css():
             border-radius: 8px;
             padding: 20px;
             background-color: {COLORS["card"]};
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             margin-bottom: 20px;
             border: 1px solid {COLORS["border"]};
             color: {COLORS["text"]};
@@ -93,8 +95,34 @@ def load_css():
         }}
 
         /* Sidebar styling */
-        .css-1d391kg {{
-            background-color: {COLORS["card"]};
+        .css-1d391kg, [data-testid="stSidebar"] {{
+            background-color: {COLORS["sidebar_bg"]} !important;
+            color: {COLORS["sidebar_text"]} !important;
+        }}
+
+        /* Fix sidebar text color */
+        [data-testid="stSidebar"] .stRadio label,
+        [data-testid="stSidebar"] .stRadio div,
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] li,
+        [data-testid="stSidebar"] .stMarkdown,
+        [data-testid="stSidebar"] .stMarkdown p {{
+            color: {COLORS["sidebar_text"]} !important;
+        }}
+
+        /* Fix sidebar radio buttons */
+        [data-testid="stSidebar"] .stRadio label span p {{
+            color: {COLORS["sidebar_text"]} !important;
+            font-weight: 400;
+        }}
+
+        /* Fix sidebar radio button selected state */
+        [data-testid="stSidebar"] .stRadio input:checked + div {{
+            border-color: {COLORS["primary"]} !important;
+            background-color: rgba(30, 136, 229, 0.2) !important;
         }}
 
         /* Button styling */
@@ -117,8 +145,9 @@ def load_css():
             border-radius: 8px;
             padding: 15px;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             color: {COLORS["text"]};
+            border: 1px solid {COLORS["border"]};
         }}
 
         .metric-value {{
@@ -131,6 +160,32 @@ def load_css():
         .metric-label {{
             font-size: 1rem;
             color: {COLORS["text_secondary"]};
+        }}
+
+        /* Fix for streamlit widgets */
+        .stSelectbox label, .stMultiSelect label, .stSlider label {{
+            color: {COLORS["text"]} !important;
+        }}
+
+        .stSelectbox > div > div, .stMultiSelect > div > div {{
+            background-color: {COLORS["card"]} !important;
+            color: {COLORS["text"]} !important;
+            border: 1px solid {COLORS["border"]} !important;
+        }}
+
+        /* Fix for streamlit tabs */
+        .stTabs [data-baseweb="tab-list"] {{
+            background-color: {COLORS["background"]} !important;
+            border-bottom: 1px solid {COLORS["border"]} !important;
+        }}
+
+        .stTabs [data-baseweb="tab"] {{
+            color: {COLORS["text"]} !important;
+        }}
+
+        .stTabs [aria-selected="true"] {{
+            background-color: {COLORS["primary"]}30 !important;
+            color: {COLORS["text"]} !important;
         }}
 
         /* Alert box styling */
@@ -249,15 +304,36 @@ def load_css():
         /* Fix for dataframe text */
         .dataframe {{
             color: {COLORS["text"]};
+            background-color: {COLORS["card"]};
+            border: 1px solid {COLORS["border"]};
         }}
 
         .dataframe th {{
             color: {COLORS["text"]};
-            background-color: {COLORS["primary"]}20;
+            background-color: {COLORS["primary"]}50 !important;
+            border-bottom: 1px solid {COLORS["border"]};
         }}
 
         .dataframe td {{
             color: {COLORS["text"]};
+            border-bottom: 1px solid {COLORS["border"]}30;
+        }}
+
+        /* Fix for plotly charts */
+        .js-plotly-plot .plotly {{
+            background-color: {COLORS["card"]} !important;
+        }}
+
+        .js-plotly-plot .plotly .main-svg {{
+            background-color: {COLORS["card"]} !important;
+        }}
+
+        /* Fix for all charts and visualizations */
+        .stPlotlyChart, .stDataFrame {{
+            background-color: {COLORS["card"]};
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid {COLORS["border"]};
         }}
     </style>
     """, unsafe_allow_html=True)
@@ -276,4 +352,50 @@ def setup_page():
         layout="wide",
         initial_sidebar_state="expanded"
     )
+
+    # Set dark theme for Plotly charts
+    st.markdown("""
+    <script>
+        const setPlotlyDarkMode = () => {
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .js-plotly-plot .plotly .main-svg {
+                    background-color: #2A2A3C !important;
+                }
+                .js-plotly-plot .plotly .bg {
+                    fill: #2A2A3C !important;
+                }
+                .js-plotly-plot .plotly .xtick text,
+                .js-plotly-plot .plotly .ytick text,
+                .js-plotly-plot .plotly .gtitle,
+                .js-plotly-plot .plotly .ztick text {
+                    fill: #FFFFFF !important;
+                }
+                .js-plotly-plot .plotly .xaxis .title,
+                .js-plotly-plot .plotly .yaxis .title,
+                .js-plotly-plot .plotly .zaxis .title {
+                    fill: #FFFFFF !important;
+                }
+                .js-plotly-plot .plotly .legend .bg {
+                    fill: #2A2A3C !important;
+                }
+                .js-plotly-plot .plotly .legend text {
+                    fill: #FFFFFF !important;
+                }
+                .js-plotly-plot .plotly path.xgrid,
+                .js-plotly-plot .plotly path.ygrid {
+                    stroke: #3A3A4C !important;
+                }
+            `;
+            document.head.appendChild(style);
+        };
+
+        if (window.parent.document.readyState === 'complete') {
+            setPlotlyDarkMode();
+        } else {
+            window.parent.addEventListener('load', setPlotlyDarkMode);
+        }
+    </script>
+    """, unsafe_allow_html=True)
+
     load_css()
