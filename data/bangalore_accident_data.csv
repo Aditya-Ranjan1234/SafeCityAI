@@ -1,0 +1,21 @@
+location,latitude,longitude,severity,incidents,description
+Silk Board Junction,12.9177,77.6233,high,42,Heavy traffic congestion with poor lane discipline
+KR Puram Bridge,13.0054,77.6714,high,38,Narrow bridge with heavy vehicle movement
+Hebbal Flyover,13.0358,77.5946,high,35,Complex junction with multiple entry/exit points
+Marathahalli Bridge,12.9591,77.6974,medium,25,Poor road conditions and inadequate lighting
+Bannerghatta Road,12.8933,77.5970,medium,28,Narrow roads with heavy traffic
+Tin Factory,12.9984,77.6610,high,32,Chaotic traffic with poor signal management
+Mekhri Circle,13.0152,77.5843,medium,22,Roundabout with poor lane markings
+Yeshwanthpur Junction,13.0204,77.5563,medium,24,Railway crossing nearby with heavy commercial vehicles
+Jayadeva Flyover,12.9227,77.6127,high,30,Construction work causing diversions
+Electronic City Flyover,12.8440,77.6608,medium,26,High-speed corridor with inadequate safety barriers
+Whitefield Main Road,12.9698,77.7499,medium,23,IT corridor with high traffic during peak hours
+Mysore Road,12.9456,77.5336,high,33,Highway entry point with poor traffic management
+Old Madras Road,13.0098,77.6406,medium,27,Narrow sections with heavy vehicle movement
+Tumkur Road,13.0158,77.5362,high,31,Highway with inadequate pedestrian crossings
+Hosur Road,12.8489,77.6270,high,36,Industrial area with heavy truck movement
+Outer Ring Road (Bellandur),12.9254,77.6770,high,34,IT corridor with multiple junctions
+Old Airport Road,12.9609,77.6487,medium,29,Poor road maintenance and potholes
+Kanakapura Road,12.8981,77.5673,medium,24,Narrow road with increasing traffic volume
+Bellary Road,13.0622,77.5963,high,37,Airport route with high-speed traffic
+Richmond Road,12.9667,77.6099,medium,21,Narrow road with poor visibility at night
