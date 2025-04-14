@@ -61,7 +61,7 @@ def load_css():
         /* Sub headers */
         .sub-header {{
             font-size: 1.5rem;
-            color: {COLORS["secondary"]};
+            color: {COLORS["text"]};
             font-weight: 500;
         }}
 
