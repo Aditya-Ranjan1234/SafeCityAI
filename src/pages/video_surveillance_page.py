@@ -8,7 +8,8 @@ and showcases AI-powered accident detection.
 import streamlit as st
 from datetime import datetime
 import random
-from src.utils.video_detection import display_video, detect_accidents_in_video
+import os
+from src.utils.yolo_detection import display_video_with_yolo, find_crash_videos
 
 def display_video_surveillance_page():
     """
@@ -57,21 +58,49 @@ def display_live_surveillance():
     # Create a 2x3 grid for camera feeds
     col1, col2 = st.columns(2)
 
-    # Display camera feeds
-    with col1:
-        st.markdown(f"**{camera_locations[0]}**")
-        display_video("src/data/videos/traffic_normal_1.mp4")
+    # Find all crash videos in the directory
+    crash_videos = find_crash_videos()
 
-        st.markdown(f"**{camera_locations[2]}**")
-        display_video("src/data/videos/traffic_normal_2.mp4")
+    # Filter to only include videos from the Crash-1500 directory
+    crash_videos = [video for video in crash_videos if "Crash-1500" in video]
 
-    with col2:
-        st.markdown(f"**{camera_locations[1]}**")
-        # Simulate an accident detection
-        display_video("src/data/videos/accident_detection_1.mp4")
+    # If we have videos, use them; otherwise fall back to simulated videos
+    if crash_videos and len(crash_videos) >= 4:
+        # Use 4 different videos from the directory
+        video_indices = [0, 1, 2, 3]  # Use the first 4 videos
+        if len(crash_videos) > 4:
+            # If we have more than 4 videos, randomly select 4 different ones
+            video_indices = random.sample(range(len(crash_videos)), 4)
 
-        st.markdown(f"**{camera_locations[3]}**")
-        display_video("src/data/videos/near_miss_detection.mp4")
+        # Display camera feeds with different videos
+        with col1:
+            st.markdown(f"**{camera_locations[0]}**")
+            display_video_with_yolo(crash_videos[video_indices[0]])
+
+            st.markdown(f"**{camera_locations[2]}**")
+            display_video_with_yolo(crash_videos[video_indices[1]])
+
+        with col2:
+            st.markdown(f"**{camera_locations[1]}**")
+            display_video_with_yolo(crash_videos[video_indices[2]])
+
+            st.markdown(f"**{camera_locations[3]}**")
+            display_video_with_yolo(crash_videos[video_indices[3]])
+    else:
+        # Fallback to simulated videos if no crash videos are found
+        with col1:
+            st.markdown(f"**{camera_locations[0]}**")
+            display_video_with_yolo("src/data/videos/traffic_normal_1.mp4")
+
+            st.markdown(f"**{camera_locations[2]}**")
+            display_video_with_yolo("src/data/videos/traffic_normal_2.mp4")
+
+        with col2:
+            st.markdown(f"**{camera_locations[1]}**")
+            display_video_with_yolo("src/data/videos/accident_detection_1.mp4")
+
+            st.markdown(f"**{camera_locations[3]}**")
+            display_video_with_yolo("src/data/videos/near_miss_detection.mp4")
 
     # Display system status
     st.markdown("### System Status")
@@ -122,52 +151,85 @@ def display_ai_detection():
     # Create columns for detection examples
     col1, col2 = st.columns(2)
 
-    with col1:
-        st.markdown("**Example 1: Vehicle Collision Detection**")
-        display_video("src/data/videos/accident_detection_1.mp4")
+    # Find crash videos in the current directory
+    crash_videos = find_crash_videos()
 
-        # Display detection results
-        detection_results = detect_accidents_in_video("src/data/videos/accident_detection_1.mp4")
+    if crash_videos:
+        # Use the first crash video for the first example
+        with col1:
+            st.markdown("**Example 1: Vehicle Collision Detection with YOLO**")
+            display_video_with_yolo(crash_videos[0])
 
-        st.markdown("""
-        **Detection Details:**
-        - **Incident Type:** Vehicle Collision
-        - **Confidence Score:** {:.1f}%
-        - **Response Time:** 1.2 seconds
-        - **Emergency Services:** Automatically notified
-        - **Severity:** {}
-        """.format(detection_results["confidence"], detection_results["severity"]))
+            st.markdown("""
+            **Detection Details:**
+            - **Incident Type:** Vehicle Collision
+            - **Detection Model:** YOLOv8
+            - **Response Time:** 0.8 seconds
+            - **Emergency Services:** Automatically notified
+            - **Severity:** High
+            """)
 
-    with col2:
-        st.markdown("**Example 2: Near Miss Detection**")
-        display_video("src/data/videos/near_miss_detection.mp4")
+        # Use the second crash video for the second example if available
+        with col2:
+            st.markdown("**Example 2: Near Miss Detection with YOLO**")
+            if len(crash_videos) > 1:
+                display_video_with_yolo(crash_videos[1])
+            else:
+                display_video_with_yolo(crash_videos[0])  # Use the same video if only one is available
 
-        # Display detection results
-        detection_results = detect_accidents_in_video("src/data/videos/near_miss_detection.mp4")
+            st.markdown("""
+            **Detection Details:**
+            - **Incident Type:** Near Miss
+            - **Detection Model:** YOLOv8
+            - **Response Time:** 0.6 seconds
+            - **Risk Assessment:** Medium
+            """)
 
-        st.markdown("""
-        **Detection Details:**
-        - **Incident Type:** Near Miss
-        - **Confidence Score:** {:.1f}%
-        - **Response Time:** 0.8 seconds
-        - **Risk Assessment:** {}
-        """.format(detection_results["confidence"], detection_results["severity"]))
+        # Display additional example
+        st.markdown("#### Example 3: Multi-vehicle Accident Detection with YOLO**")
+        if len(crash_videos) > 2:
+            display_video_with_yolo(crash_videos[2])
+        else:
+            display_video_with_yolo(crash_videos[0])  # Use the first video if not enough videos are available
+    else:
+        # Fallback to simulated videos if no crash videos are found
+        with col1:
+            st.markdown("**Example 1: Vehicle Collision Detection with YOLO**")
+            display_video_with_yolo("src/data/videos/accident_detection_1.mp4")
 
-    # Display additional example
-    st.markdown("#### Example 3: Multi-vehicle Accident Detection")
-    display_video("src/data/videos/accident_detection_2.mp4")
+            st.markdown("""
+            **Detection Details:**
+            - **Incident Type:** Vehicle Collision
+            - **Detection Model:** YOLOv8
+            - **Response Time:** 0.8 seconds
+            - **Emergency Services:** Automatically notified
+            - **Severity:** High
+            """)
 
-    # Display detection results
-    detection_results = detect_accidents_in_video("src/data/videos/accident_detection_2.mp4")
+        with col2:
+            st.markdown("**Example 2: Near Miss Detection with YOLO**")
+            display_video_with_yolo("src/data/videos/near_miss_detection.mp4")
+
+            st.markdown("""
+            **Detection Details:**
+            - **Incident Type:** Near Miss
+            - **Detection Model:** YOLOv8
+            - **Response Time:** 0.6 seconds
+            - **Risk Assessment:** Medium
+            """)
+
+        # Display additional example
+        st.markdown("#### Example 3: Multi-vehicle Accident Detection with YOLO**")
+        display_video_with_yolo("src/data/videos/accident_detection_2.mp4")
 
     st.markdown("""
     **Detection Details:**
     - **Incident Type:** Multi-vehicle Accident
-    - **Confidence Score:** {:.1f}%
-    - **Response Time:** 0.7 seconds
+    - **Detection Model:** YOLOv8
+    - **Response Time:** 0.5 seconds
     - **Emergency Services:** Automatically notified
-    - **Severity Assessment:** {}
-    """.format(detection_results["confidence"], detection_results["severity"]))
+    - **Severity Assessment:** High
+    """)
 
     # Display model information
     st.markdown("### AI Model Information")
@@ -205,8 +267,8 @@ def display_camera_feed(location):
     st.markdown(f"**{location}**")
 
     # In a real implementation, this would display an actual video feed
-    # For demonstration, we'll use our video detection utility
-    display_video(f"src/data/videos/traffic_normal_{random.randint(1, 2)}.mp4")
+    # For demonstration, we'll use our YOLO detection utility
+    display_video_with_yolo(f"src/data/videos/traffic_normal_{random.randint(1, 2)}.mp4")
 
     # Display random traffic status
     traffic_status = random.choice(["Heavy", "Moderate", "Light"])

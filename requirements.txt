@@ -1,32 +1,38 @@
 # Core dependencies
-streamlit>=1.20.0
-pandas>=1.5.0
-numpy>=1.20.0
+streamlit>=1.32.0
+pandas>=2.2.0
+numpy>=1.26.0
+matplotlib>=3.8.0
 
 # Mapping and geospatial
-folium>=0.14.0
-streamlit-folium>=0.11.0
-geopy>=2.3.0
-networkx>=2.8.0  # For route planning algorithms
+folium>=0.15.0
+streamlit-folium>=0.15.0
+geopy>=2.4.0
+networkx>=3.2.0  # For route planning algorithms
 
 # API and data fetching
-requests>=2.28.0
-openmeteo-requests>=1.0.0
+requests>=2.31.0
+openmeteo-requests>=1.1.0
 retry-requests>=2.0.0
-python-dotenv>=0.21.0
+python-dotenv>=1.0.0
+
+# Natural language processing
+googletrans>=3.1.0a0
 
 # Data visualization
-plotly>=5.10.0
+plotly>=5.18.0
 
 # AI and ML components
-opencv-python>=4.6.0  # For video processing
-scikit-learn>=1.0.0  # For ML predictions
+opencv-python>=4.9.0  # For video processing
+scikit-learn>=1.4.0  # For ML predictions
+ultralytics>=8.1.0  # For YOLOv8 object detection
+torch>=2.2.0  # For deep learning (required by YOLOv8)
+torchvision>=0.17.0  # For computer vision models
+supervision>=0.18.0  # For object detection visualization
 
 # Utility libraries
-pillow>=9.0.0  # For image processing
-
-# Optional dependencies (comment out if causing conflicts)
-# matplotlib>=3.5.0
+pillow>=10.2.0  # For image processing
+python-dateutil>=2.8.2
 # seaborn>=0.12.0
 # langchain>=0.0.200
 # langchain-openai>=0.0.1

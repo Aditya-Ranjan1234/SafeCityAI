@@ -32,12 +32,19 @@ This project is developed as part of the [समAI - Time for AI](https://wequit
 - **Accident Hotspot Avoidance**: Automatically routes around known dangerous areas
 - **Time and Distance Estimates**: Compare safety vs. convenience trade-offs
 
-### 📹 Video Surveillance & AI Accident Detection
+### 📹 Video Surveillance & YOLO-based Accident Detection
 - **Real-time Monitoring**: Live camera feeds from high-risk areas across Bangalore
-- **AI-Powered Detection**: Automatic identification of accidents and near-misses
+- **YOLOv8 Detection**: State-of-the-art object detection for vehicles and crashes
+- **Bounding Box Visualization**: Real-time tracking of vehicles with confidence scores
+- **Crash Analysis**: Automatic identification of accidents based on vehicle proximity and motion
+- **Multi-Camera Support**: Simultaneous monitoring of multiple locations with different video feeds
 - **Instant Alerts**: Immediate notification when incidents are detected
 - **Emergency Response**: Automatic dispatch of emergency services
-- **Incident Analytics**: Review and analysis of detected incidents
+- **Incident Analytics**: Review and analysis of detected incidents with detailed metrics
+- **Local Video Processing**: Automatic detection and use of videos from the Crash-1500 directory
+
+![Video Surveillance](Screenshot%202025-04-15%20142906.png)
+*Real-time video surveillance with YOLO-based crash detection across multiple camera feeds in Bangalore*
 
 ### 🤖 Machine Learning Predictions
 - **Risk Prediction**: AI-powered prediction of accident likelihood based on multiple factors
@@ -182,6 +189,7 @@ The application follows a modular architecture with clear separation of concerns
 
 ```
 ├── app.py                      # Main Streamlit application
+├── sample.py                    # Standalone crash detection interface
 ├── requirements.txt            # Python dependencies
 ├── .env                        # Environment variables (API keys)
 ├── src/                        # Source code
@@ -204,7 +212,8 @@ The application follows a modular architecture with clear separation of concerns
 │   └── utils/                  # Utility modules
 │       ├── config.py           # Configuration settings
 │       ├── data_loader.py      # Data loading utilities
-│       └── video_detection.py  # Video processing and accident detection
+│       ├── video_detection.py  # Video processing and accident detection
+│       └── yolo_detection.py   # YOLOv8-based crash detection
 ├── CarCrashDataset/            # Reference dataset for accident detection
 ├── screenshots/                # Application screenshots for documentation
 └── images/                     # Application screenshots for README
@@ -232,3 +241,27 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Folium](https://python-visualization.github.io/folium/) for the interactive mapping capabilities
 - [CarCrashDataset](https://github.com/Cogito2012/CarCrashDataset) for providing reference data for accident detection
 - [NetworkX](https://networkx.org/) for the graph algorithms used in route planning
+- [YOLOv8](https://github.com/ultralytics/ultralytics) for state-of-the-art object detection
+
+## 🔍 Standalone Crash Detection Interface
+
+In addition to the main application, this project includes a standalone crash detection interface (`sample.py`) that allows users to upload and analyze traffic videos for crashes.
+
+### Features
+
+- **Video Upload**: Upload any traffic video for crash analysis
+- **YOLOv8 Processing**: Frame-by-frame analysis with state-of-the-art object detection
+- **Real-time Visualization**: Watch the detection process with bounding boxes
+- **Crash Frame Identification**: Pinpoints the exact moment of collision
+- **Detailed Analysis**: Provides confidence scores, timestamps, and severity assessment
+- **Emergency Recommendations**: Suggests actions to take when a crash is detected
+
+### Usage
+
+To run the standalone crash detection interface:
+
+```bash
+streamlit run sample.py
+```
+
+This will open a web interface where you can upload traffic videos for crash analysis.
