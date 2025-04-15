@@ -7,6 +7,15 @@ user selection.
 """
 
 import streamlit as st
+
+# Set up the page configuration - MUST BE THE FIRST STREAMLIT COMMAND
+st.set_page_config(
+    page_title="Bangalore Accident Prevention System",
+    page_icon="🚨",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import os
 import sys
 
@@ -14,7 +23,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import utility modules
-from src.utils.config import setup_page
+from src.utils.config import load_css
 from src.utils.data_loader import load_accident_data, get_weather_data
 
 # Import page modules
@@ -24,8 +33,8 @@ from src.pages import route_planning_page, video_surveillance_page
 # Import components
 from src.components.emergency_services import display_emergency_banner
 
-# Set up the page configuration
-setup_page()
+# Load CSS styles
+load_css()
 
 # Add additional CSS to ensure chart text is visible
 st.markdown("""
