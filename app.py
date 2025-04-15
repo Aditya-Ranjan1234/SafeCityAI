@@ -19,12 +19,49 @@ from src.utils.data_loader import load_accident_data, get_weather_data
 
 # Import page modules
 from src.pages import home_page, accident_map_page, weather_page, report_page, ml_predictions_page
+from src.pages import route_planning_page, video_surveillance_page
 
 # Import components
 from src.components.emergency_services import display_emergency_banner
 
 # Set up the page configuration
 setup_page()
+
+# Add additional CSS to ensure chart text is visible
+st.markdown("""
+<style>
+    /* Force all text in charts to be white and bold */
+    .js-plotly-plot text,
+    .js-plotly-plot .xtick text,
+    .js-plotly-plot .ytick text,
+    .js-plotly-plot .gtitle,
+    .js-plotly-plot .ztick text,
+    .js-plotly-plot .legend text,
+    .js-plotly-plot .annotation-text,
+    .js-plotly-plot .xaxis .title,
+    .js-plotly-plot .yaxis .title,
+    .js-plotly-plot .zaxis .title {
+        fill: white !important;
+        color: white !important;
+        font-weight: bold !important;
+        text-shadow: 1px 1px 2px black !important;
+    }
+
+    /* Ensure chart backgrounds are dark */
+    .js-plotly-plot .plotly .main-svg,
+    .js-plotly-plot .bg,
+    .stPlotlyChart > div > div > div {
+        background-color: #1E1E2E !important;
+    }
+
+    /* Make axis lines visible */
+    .js-plotly-plot .xaxis path.domain,
+    .js-plotly-plot .yaxis path.domain {
+        stroke: white !important;
+        stroke-width: 2px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Initialize session state for navigation if not already set
 if 'page' not in st.session_state:
@@ -37,8 +74,8 @@ display_emergency_banner()
 st.sidebar.title("Navigation")
 selected_page = st.sidebar.radio(
     "Go to",
-    ["Home", "Accident Map", "Weather & Alerts", "ML Predictions", "Report Issue"],
-    index=["Home", "Accident Map", "Weather & Alerts", "ML Predictions", "Report Issue"].index(st.session_state.page if st.session_state.page in ["Home", "Accident Map", "Weather & Alerts", "ML Predictions", "Report Issue"] else "Home")
+    ["Home", "Accident Map", "Safe Route Planning", "Video Surveillance", "ML Predictions", "Report Issue"],
+    index=["Home", "Accident Map", "Safe Route Planning", "Video Surveillance", "ML Predictions", "Report Issue"].index(st.session_state.page if st.session_state.page in ["Home", "Accident Map", "Safe Route Planning", "Video Surveillance", "ML Predictions", "Report Issue"] else "Home")
 )
 
 # Update session state
@@ -65,8 +102,10 @@ if selected_page == "Home":
     home_page.render()
 elif selected_page == "Accident Map":
     accident_map_page.render()
-elif selected_page == "Weather & Alerts":
-    weather_page.render()
+elif selected_page == "Safe Route Planning":
+    route_planning_page.display_route_planning_page()
+elif selected_page == "Video Surveillance":
+    video_surveillance_page.display_video_surveillance_page()
 elif selected_page == "ML Predictions":
     ml_predictions_page.render()
 elif selected_page == "Report Issue":

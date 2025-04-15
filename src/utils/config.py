@@ -328,6 +328,27 @@ def load_css():
             background-color: {COLORS["card"]} !important;
         }}
 
+        /* Fix text colors in plotly charts */
+        .js-plotly-plot .plotly .xtick text,
+        .js-plotly-plot .plotly .ytick text,
+        .js-plotly-plot .plotly .gtitle,
+        .js-plotly-plot .plotly .ztick text,
+        .js-plotly-plot .plotly .legend text,
+        .js-plotly-plot .plotly .annotation-text,
+        .js-plotly-plot .plotly .pie-label {{
+            fill: {COLORS["text"]} !important;
+            color: {COLORS["text"]} !important;
+        }}
+
+        .js-plotly-plot .plotly .xaxis .title,
+        .js-plotly-plot .plotly .yaxis .title,
+        .js-plotly-plot .plotly .zaxis .title,
+        .js-plotly-plot .plotly .legend .title {{
+            fill: {COLORS["text"]} !important;
+            color: {COLORS["text"]} !important;
+            font-weight: 600 !important;
+        }}
+
         /* Fix for all charts and visualizations */
         .stPlotlyChart, .stDataFrame {{
             background-color: {COLORS["card"]};
@@ -353,6 +374,63 @@ def setup_page():
         initial_sidebar_state="expanded"
     )
 
+    # Set Plotly configuration to ensure charts are visible
+    st.markdown("""
+    <style>
+        /* Ensure Plotly charts are visible */
+        .js-plotly-plot, .plotly, .plot-container {
+            background-color: #1E1E2E !important;
+        }
+
+        .js-plotly-plot .main-svg {
+            background-color: #1E1E2E !important;
+        }
+
+        .js-plotly-plot .svg-container {
+            background-color: #1E1E2E !important;
+        }
+
+        /* Make sure text in charts is visible */
+        .js-plotly-plot text,
+        .js-plotly-plot .xtick text,
+        .js-plotly-plot .ytick text,
+        .js-plotly-plot .xaxislayer-above text,
+        .js-plotly-plot .yaxislayer-above text,
+        .js-plotly-plot .zaxislayer-above text,
+        .js-plotly-plot .overaxes-above text,
+        .js-plotly-plot .xaxislayer text,
+        .js-plotly-plot .yaxislayer text,
+        .js-plotly-plot .zaxislayer text,
+        .js-plotly-plot .layer text,
+        .js-plotly-plot .legend text {
+            fill: white !important;
+            color: white !important;
+            font-weight: bold !important;
+            text-shadow: 0px 0px 2px rgba(0,0,0,0.8) !important;
+        }
+
+        /* Ensure axis lines are visible */
+        .js-plotly-plot .xaxis .zerolinelayer path,
+        .js-plotly-plot .yaxis .zerolinelayer path,
+        .js-plotly-plot .xaxis path,
+        .js-plotly-plot .yaxis path {
+            stroke: white !important;
+            stroke-width: 1.5px !important;
+        }
+
+        /* Fix for chart containers */
+        .element-container iframe {
+            border: 1px solid #3A3A4C !important;
+            border-radius: 8px !important;
+        }
+
+        /* Ensure chart background is dark */
+        .stPlotlyChart > div > div > div {
+            background-color: #1E1E2E !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
     # Set dark theme for Plotly charts
     st.markdown("""
     <script>
@@ -360,34 +438,79 @@ def setup_page():
             const style = document.createElement('style');
             style.innerHTML = `
                 .js-plotly-plot .plotly .main-svg {
-                    background-color: #2A2A3C !important;
+                    background-color: #1E1E2E !important;
                 }
                 .js-plotly-plot .plotly .bg {
-                    fill: #2A2A3C !important;
+                    fill: #1E1E2E !important;
                 }
                 .js-plotly-plot .plotly .xtick text,
                 .js-plotly-plot .plotly .ytick text,
                 .js-plotly-plot .plotly .gtitle,
-                .js-plotly-plot .plotly .ztick text {
+                .js-plotly-plot .plotly .ztick text,
+                .js-plotly-plot .plotly .annotation-text,
+                .js-plotly-plot .plotly .pie-label {
                     fill: #FFFFFF !important;
+                    color: #FFFFFF !important;
+                    font-weight: bold !important;
+                    font-size: 14px !important;
+                    text-shadow: 0px 0px 2px rgba(0,0,0,0.8) !important;
                 }
                 .js-plotly-plot .plotly .xaxis .title,
                 .js-plotly-plot .plotly .yaxis .title,
                 .js-plotly-plot .plotly .zaxis .title {
                     fill: #FFFFFF !important;
+                    color: #FFFFFF !important;
+                    font-weight: 600 !important;
+                    font-size: 16px !important;
                 }
                 .js-plotly-plot .plotly .legend .bg {
-                    fill: #2A2A3C !important;
+                    fill: #1E1E2E !important;
+                    stroke: #FFFFFF !important;
+                    stroke-width: 1px !important;
                 }
                 .js-plotly-plot .plotly .legend text {
                     fill: #FFFFFF !important;
+                    color: #FFFFFF !important;
+                    font-weight: bold !important;
                 }
                 .js-plotly-plot .plotly path.xgrid,
                 .js-plotly-plot .plotly path.ygrid {
-                    stroke: #3A3A4C !important;
+                    stroke: rgba(255,255,255,0.2) !important;
+                }
+                /* Make sure all text elements are visible */
+                .js-plotly-plot text {
+                    fill: #FFFFFF !important;
+                    color: #FFFFFF !important;
+                }
+                /* Ensure axis lines are visible */
+                .js-plotly-plot .plotly .xaxis path.domain,
+                .js-plotly-plot .plotly .yaxis path.domain {
+                    stroke: #FFFFFF !important;
+                    stroke-width: 2px !important;
+                }
+                /* Fix for chart containers */
+                .element-container iframe {
+                    border: 1px solid #FFFFFF !important;
+                    border-radius: 8px !important;
                 }
             `;
             document.head.appendChild(style);
+
+            // Force redraw of all Plotly charts
+            setTimeout(() => {
+                const charts = document.querySelectorAll('.js-plotly-plot');
+                charts.forEach(chart => {
+                    if (chart && chart._fullLayout) {
+                        window.Plotly.relayout(chart, {
+                            'xaxis.color': '#FFFFFF',
+                            'yaxis.color': '#FFFFFF',
+                            'paper_bgcolor': '#1E1E2E',
+                            'plot_bgcolor': '#1E1E2E',
+                            'font.color': '#FFFFFF'
+                        });
+                    }
+                });
+            }, 1000);
         };
 
         if (window.parent.document.readyState === 'complete') {
@@ -395,6 +518,9 @@ def setup_page():
         } else {
             window.parent.addEventListener('load', setPlotlyDarkMode);
         }
+
+        // Also run after a short delay to catch dynamically loaded charts
+        setTimeout(setPlotlyDarkMode, 2000);
     </script>
     """, unsafe_allow_html=True)
 

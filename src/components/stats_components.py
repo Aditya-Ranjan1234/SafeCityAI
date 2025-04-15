@@ -14,139 +14,127 @@ from src.utils.config import COLORS
 def display_accident_stats(data):
     """
     Display accident statistics visualizations.
-    
+
     Args:
         data (pandas.DataFrame): DataFrame containing accident data
-    
+
     Returns:
         None: Displays statistics in the Streamlit app
     """
     if data.empty:
         st.error("No accident data available for statistics")
         return
-    
-    col1, col2 = st.columns(2)
-    
+
+    # Display text-based statistics instead of charts
+    st.markdown("<h3>Accident Statistics</h3>", unsafe_allow_html=True)
+
+    # Create columns for key metrics
+    col1, col2, col3 = st.columns(3)
+
     with col1:
-        # Create a bar chart of incidents by location (top 10)
-        top_locations = data.sort_values('incidents', ascending=False).head(10)
-        fig = px.bar(
-            top_locations,
-            x='location',
-            y='incidents',
-            color='severity',
-            color_discrete_map={
-                'high': COLORS["hazard_high"], 
-                'medium': COLORS["hazard_medium"], 
-                'low': COLORS["hazard_low"]
-            },
-            title='Top 10 Accident Hotspots',
-            labels={'incidents': 'Number of Incidents', 'location': 'Location'}
-        )
-        fig.update_layout(
-            xaxis_tickangle=-45,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(0,0,0,0.1)'),
-            margin=dict(l=20, r=20, t=40, b=80),
-            legend_title_text='Severity'
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    
+        # Total incidents
+        total_incidents = data['incidents'].sum()
+        st.metric("Total Incidents", f"{total_incidents:,}")
+
     with col2:
-        # Create a pie chart of incidents by severity
-        severity_counts = data.groupby('severity')['incidents'].sum().reset_index()
-        fig = px.pie(
-            severity_counts,
-            values='incidents',
-            names='severity',
-            color='severity',
-            color_discrete_map={
-                'high': COLORS["hazard_high"], 
-                'medium': COLORS["hazard_medium"], 
-                'low': COLORS["hazard_low"]
-            },
-            title='Incidents by Severity Level'
-        )
-        fig.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            margin=dict(l=20, r=20, t=40, b=20),
-            legend_title_text='Severity'
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    
-    # Additional statistics if we have accident_type in the data
+        # High severity incidents
+        high_severity = data[data['severity'] == 'high']['incidents'].sum()
+        high_pct = (high_severity / total_incidents) * 100 if total_incidents > 0 else 0
+        st.metric("High Severity", f"{high_severity:,}", f"{high_pct:.1f}%")
+
+    with col3:
+        # Most common accident type
+        if 'accident_type' in data.columns:
+            accident_types = data.groupby('accident_type')['incidents'].sum().reset_index()
+            most_common_type = accident_types.loc[accident_types['incidents'].idxmax(), 'accident_type']
+            st.metric("Most Common Type", most_common_type)
+        else:
+            st.metric("Most Common Type", "N/A")
+
+    # Display top accident locations in a table
+    st.markdown("<h4>Top 5 Accident Hotspots</h4>", unsafe_allow_html=True)
+    top_locations = data.sort_values('incidents', ascending=False).head(5)
+
+    # Format the table data
+    table_data = {
+        "Location": top_locations['location'],
+        "Incidents": top_locations['incidents'],
+        "Severity": top_locations['severity'].str.capitalize()
+    }
+
+    # Display as a table
+    st.table(pd.DataFrame(table_data))
+
+    # Display time-based statistics
+    st.markdown("<h4>Time-based Statistics</h4>", unsafe_allow_html=True)
+
+    # Create columns for time-based metrics
+    col1, col2 = st.columns(2)
+
+    with col1:
+        # Peak hours data
+        if 'peak_hours' in data.columns:
+            peak_hours = data.groupby('peak_hours')['incidents'].sum().reset_index()
+            peak_time = peak_hours.loc[peak_hours['incidents'].idxmax(), 'peak_hours']
+            peak_incidents = peak_hours.loc[peak_hours['incidents'].idxmax(), 'incidents']
+
+            st.markdown(f"**Peak Time:** {peak_time}")
+            st.markdown(f"**Incidents during peak time:** {peak_incidents:,}")
+        else:
+            st.markdown("**Peak Time:** N/A")
+            st.markdown("**Incidents during peak time:** N/A")
+
+    with col2:
+        # Weather-related incidents
+        weather_related = data[data['weather_related'] == True]['incidents'].sum() if 'weather_related' in data.columns else 0
+        weather_pct = (weather_related / total_incidents) * 100 if total_incidents > 0 else 0
+
+        st.markdown(f"**Weather-related incidents:** {weather_related:,}")
+        st.markdown(f"**Percentage of total:** {weather_pct:.1f}%")
+
+    # Display accident types in a table if available
     if 'accident_type' in data.columns:
-        # Create a bar chart of incidents by accident type
+        st.markdown("<h4>Incidents by Accident Type</h4>", unsafe_allow_html=True)
         accident_type_counts = data.groupby('accident_type')['incidents'].sum().reset_index()
-        fig = px.bar(
-            accident_type_counts,
-            x='accident_type',
-            y='incidents',
-            color='accident_type',
-            title='Incidents by Accident Type',
-            labels={'incidents': 'Number of Incidents', 'accident_type': 'Accident Type'}
-        )
-        fig.update_layout(
-            xaxis_tickangle=0,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(0,0,0,0.1)'),
-            margin=dict(l=20, r=20, t=40, b=20),
-            showlegend=False
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    
-    # Additional statistics if we have peak_hours in the data
-    if 'peak_hours' in data.columns:
-        # Create a bar chart of incidents by peak hours
-        peak_hours_counts = data.groupby('peak_hours')['incidents'].sum().reset_index()
-        fig = px.bar(
-            peak_hours_counts,
-            x='peak_hours',
-            y='incidents',
-            color='peak_hours',
-            title='Incidents by Time of Day',
-            labels={'incidents': 'Number of Incidents', 'peak_hours': 'Time of Day'}
-        )
-        fig.update_layout(
-            xaxis_tickangle=0,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(0,0,0,0.1)'),
-            margin=dict(l=20, r=20, t=40, b=20),
-            showlegend=False
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        accident_type_counts = accident_type_counts.sort_values('incidents', ascending=False)
+
+        # Calculate percentages
+        accident_type_counts['percentage'] = (accident_type_counts['incidents'] / total_incidents * 100).round(1)
+
+        # Format the table data
+        accident_table = {
+            "Accident Type": accident_type_counts['accident_type'],
+            "Incidents": accident_type_counts['incidents'],
+            "Percentage": accident_type_counts['percentage'].apply(lambda x: f"{x}%")
+        }
+
+        # Display as a table
+        st.table(pd.DataFrame(accident_table))
 
 def display_key_metrics(data):
     """
     Display key metrics about accident data.
-    
+
     Args:
         data (pandas.DataFrame): DataFrame containing accident data
-    
+
     Returns:
         None: Displays metrics in the Streamlit app
     """
     if data.empty:
         return
-    
+
     # Calculate metrics
     total_incidents = data['incidents'].sum()
     high_severity = data[data['severity'] == 'high']['incidents'].sum()
     high_severity_percentage = (high_severity / total_incidents) * 100 if total_incidents > 0 else 0
-    
+
     # Get top hotspot
     top_hotspot = data.loc[data['incidents'].idxmax()]
-    
+
     # Display metrics in columns
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.markdown(f"""
         <div class='metric-container'>
@@ -155,7 +143,7 @@ def display_key_metrics(data):
             <div class='metric-label'>Identified high-risk areas</div>
         </div>
         """, unsafe_allow_html=True)
-    
+
     with col2:
         st.markdown(f"""
         <div class='metric-container'>
@@ -164,7 +152,7 @@ def display_key_metrics(data):
             <div class='metric-label'>Of total reported incidents</div>
         </div>
         """, unsafe_allow_html=True)
-    
+
     with col3:
         st.markdown(f"""
         <div class='metric-container'>
@@ -177,27 +165,27 @@ def display_key_metrics(data):
 def display_data_table(data, columns=None):
     """
     Display a formatted data table.
-    
+
     Args:
         data (pandas.DataFrame): DataFrame to display
         columns (list): List of columns to include (None for all)
-    
+
     Returns:
         None: Displays table in the Streamlit app
     """
     if data.empty:
         st.warning("No data available to display")
         return
-    
+
     # Filter columns if specified
     if columns:
         display_data = data[columns].copy()
     else:
         display_data = data.copy()
-    
+
     # Format column names for display
     display_data.columns = [col.replace('_', ' ').title() for col in display_data.columns]
-    
+
     # Display the table
     st.dataframe(
         display_data,

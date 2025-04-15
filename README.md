@@ -25,6 +25,20 @@ This project is developed as part of the [समAI - Time for AI](https://wequit
 ![Accident Map](images/accident_map.png)
 *The interactive map visualizes accident hotspots across Bangalore with color-coded markers indicating severity levels, allowing users to identify high-risk areas at a glance.*
 
+### 🛣️ Safe Route Planning
+- **Source-Destination Selection**: Choose starting and ending points in Bangalore
+- **Safety-Optimized Routes**: Get routes that avoid high-accident areas
+- **Risk Assessment**: View safety scores for suggested routes
+- **Accident Hotspot Avoidance**: Automatically routes around known dangerous areas
+- **Time and Distance Estimates**: Compare safety vs. convenience trade-offs
+
+### 📹 Video Surveillance & AI Accident Detection
+- **Real-time Monitoring**: Live camera feeds from high-risk areas across Bangalore
+- **AI-Powered Detection**: Automatic identification of accidents and near-misses
+- **Instant Alerts**: Immediate notification when incidents are detected
+- **Emergency Response**: Automatic dispatch of emergency services
+- **Incident Analytics**: Review and analysis of detected incidents
+
 ### 🤖 Machine Learning Predictions
 - **Risk Prediction**: AI-powered prediction of accident likelihood based on multiple factors
 - **City-wide Risk Map**: Color-coded visualization of risk levels across the entire city
@@ -135,7 +149,20 @@ The application follows a modular architecture with clear separation of concerns
    pip install -r requirements.txt
    ```
 
-4. Configure environment variables (if needed):
+   Note: The application uses several key dependencies:
+   - **Streamlit**: For the interactive web interface
+   - **Folium**: For interactive maps and route visualization
+   - **NetworkX**: For route planning algorithms
+   - **OpenCV**: For video processing and accident detection
+   - **Plotly**: For data visualization
+   - **Scikit-learn**: For machine learning predictions
+
+4. Download the CarCrash dataset for accident detection (optional):
+   ```bash
+   git clone https://github.com/Cogito2012/CarCrashDataset.git
+   ```
+
+5. Configure environment variables (if needed):
    - Rename `.env.example` to `.env`
    - Add your API keys for weather services
 
@@ -161,18 +188,24 @@ The application follows a modular architecture with clear separation of concerns
 │   ├── components/             # UI components
 │   │   ├── emergency_services.py  # Emergency services components
 │   │   ├── map_components.py   # Map visualization components
-│   │   └── stats_components.py # Statistical visualization components
+│   │   ├── stats_components.py # Statistical visualization components
+│   │   └── weather_components.py # Weather visualization components
 │   ├── data/                   # Data files
-│   │   └── bangalore_accident_data.csv  # Accident hotspot data
+│   │   ├── bangalore_accident_data.csv  # Accident hotspot data
+│   │   └── videos/              # Video files for surveillance demo
 │   ├── pages/                  # Application pages
 │   │   ├── home_page.py        # Home page
 │   │   ├── accident_map_page.py # Accident map page
 │   │   ├── ml_predictions_page.py # ML predictions page
+│   │   ├── route_planning_page.py # Safe route planning page
+│   │   ├── video_surveillance_page.py # Video surveillance page
 │   │   ├── weather_page.py     # Weather and alerts page
 │   │   └── report_page.py      # Issue reporting page
 │   └── utils/                  # Utility modules
 │       ├── config.py           # Configuration settings
-│       └── data_loader.py      # Data loading utilities
+│       ├── data_loader.py      # Data loading utilities
+│       └── video_detection.py  # Video processing and accident detection
+├── CarCrashDataset/            # Reference dataset for accident detection
 ├── screenshots/                # Application screenshots for documentation
 └── images/                     # Application screenshots for README
 ```
@@ -197,3 +230,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Open-Meteo](https://open-meteo.com/) for providing free weather API
 - [Streamlit](https://streamlit.io/) for the excellent web application framework
 - [Folium](https://python-visualization.github.io/folium/) for the interactive mapping capabilities
+- [CarCrashDataset](https://github.com/Cogito2012/CarCrashDataset) for providing reference data for accident detection
+- [NetworkX](https://networkx.org/) for the graph algorithms used in route planning

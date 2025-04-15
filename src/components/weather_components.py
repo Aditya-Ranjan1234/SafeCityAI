@@ -158,46 +158,51 @@ def display_weather_forecast(weather_data):
         hours = pd.timedelta_range(start='0 hours', periods=24, freq='H')
         forecast_df['time'] = [base_date + hour for hour in hours]
 
-        # Create temperature chart
-        fig = px.line(
-            forecast_df,
-            x='time',
-            y='temperature',
-            title='Temperature Forecast (°C)',
-            labels={'temperature': 'Temperature (°C)', 'time': 'Time'},
-            markers=True
-        )
-        fig.update_layout(
-            xaxis_tickangle=-45,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(0,0,0,0.1)'),
-            margin=dict(l=20, r=20, t=40, b=20),
-            height=350
-        )
-        fig.update_traces(line=dict(color=COLORS["primary"], width=3))
-        st.plotly_chart(fig, use_container_width=True)
+        # Display temperature forecast as a table instead of a chart
+        st.markdown("<h4>Temperature Forecast</h4>", unsafe_allow_html=True)
 
-        # Create precipitation probability chart
-        fig = px.bar(
-            forecast_df,
-            x='time',
-            y='precipitation_probability',
-            title='Precipitation Probability (%)',
-            labels={'precipitation_probability': 'Probability (%)', 'time': 'Time'},
-            color_discrete_sequence=[COLORS["info"]]
-        )
-        fig.update_layout(
-            xaxis_tickangle=-45,
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(0,0,0,0.1)'),
-            margin=dict(l=20, r=20, t=40, b=20),
-            height=300
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        # Create a more compact dataframe for display
+        temp_display_df = forecast_df[['formatted_time', 'temperature']].copy()
+        temp_display_df.columns = ['Time', 'Temperature (°C)']
+
+        # Display as a table with 6 rows per column in 4 columns
+        col1, col2, col3, col4 = st.columns(4)
+        rows_per_col = 6
+
+        with col1:
+            st.table(temp_display_df.iloc[0:rows_per_col])
+
+        with col2:
+            st.table(temp_display_df.iloc[rows_per_col:rows_per_col*2])
+
+        with col3:
+            st.table(temp_display_df.iloc[rows_per_col*2:rows_per_col*3])
+
+        with col4:
+            st.table(temp_display_df.iloc[rows_per_col*3:rows_per_col*4])
+
+        # Display precipitation forecast as a table
+        st.markdown("<h4>Precipitation Probability</h4>", unsafe_allow_html=True)
+
+        # Create a more compact dataframe for display
+        precip_display_df = forecast_df[['formatted_time', 'precipitation_probability']].copy()
+        precip_display_df.columns = ['Time', 'Probability (%)']
+
+        # Display as a table with 6 rows per column in 4 columns
+        col1, col2, col3, col4 = st.columns(4)
+        rows_per_col = 6
+
+        with col1:
+            st.table(precip_display_df.iloc[0:rows_per_col])
+
+        with col2:
+            st.table(precip_display_df.iloc[rows_per_col:rows_per_col*2])
+
+        with col3:
+            st.table(precip_display_df.iloc[rows_per_col*2:rows_per_col*3])
+
+        with col4:
+            st.table(precip_display_df.iloc[rows_per_col*3:rows_per_col*4])
 
 def display_weather_alerts(alerts):
     """
