@@ -4,24 +4,39 @@ YOLO-based car crash detection for the Bangalore Accident Prevention System.
 This module contains functions for detecting vehicles and crashes using YOLO.
 """
 
-import cv2
 import numpy as np
 import time
 from datetime import datetime
 import random
-from ultralytics import YOLO
 from PIL import Image, ImageDraw, ImageFont
 import os
 import streamlit as st
 
-# Initialize YOLO model
+# Try to import OpenCV and YOLO, but handle the case when they fail
 try:
-    # Try to load the YOLO model
-    model = YOLO("yolov8n.pt")  # Load the smallest YOLOv8 model
-except Exception as e:
-    # If model loading fails, we'll use a simulated detection
-    print(f"Error loading YOLO model: {e}")
-    model = None
+    import cv2
+    OPENCV_AVAILABLE = True
+except ImportError as e:
+    OPENCV_AVAILABLE = False
+    st.warning("OpenCV could not be imported. Using fallback mode. Error: " + str(e))
+
+try:
+    from ultralytics import YOLO
+    YOLO_AVAILABLE = True
+except ImportError as e:
+    YOLO_AVAILABLE = False
+    st.warning("YOLO could not be imported. Using fallback mode. Error: " + str(e))
+
+# Initialize YOLO model
+model = None
+if YOLO_AVAILABLE:
+    try:
+        # Try to load the YOLO model
+        model = YOLO("yolov8n.pt")  # Load the smallest YOLOv8 model
+    except Exception as e:
+        # If model loading fails, we'll use a simulated detection
+        print(f"Error loading YOLO model: {e}")
+        st.warning(f"Error loading YOLO model: {e}. Using fallback mode.")
 
 def detect_objects(frame):
     """
@@ -33,8 +48,9 @@ def detect_objects(frame):
     Returns:
         list: List of detected objects with bounding boxes and classes
     """
-    if model is None:
-        # Simulate detection if model is not available
+    # Check if OpenCV and YOLO are available
+    if not OPENCV_AVAILABLE or not YOLO_AVAILABLE or model is None:
+        # Simulate detection if dependencies are not available
         return simulate_detection(frame)
 
     try:
@@ -58,10 +74,10 @@ def detect_objects(frame):
                         'confidence': conf,
                         'class': cls_name
                     })
-
         return detections
     except Exception as e:
-        print(f"Error in YOLO detection: {e}")
+        # If detection fails for any reason, fall back to simulated detections
+        print(f"Error during object detection: {e}")
         return simulate_detection(frame)
 
 def simulate_detection(frame):
@@ -156,6 +172,19 @@ def process_frame_with_yolo(frame, frame_idx, total_frames, previous_detections=
     Returns:
         tuple: (processed_frame, is_crash, crash_confidence, current_detections)
     """
+    # Check if OpenCV is available
+    if not OPENCV_AVAILABLE:
+        # Create a simulated frame with text
+        img = Image.new('RGB', (640, 480), color=(30, 30, 30))
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.load_default()
+        draw.text((20, 20), "OpenCV not available - Using fallback mode", fill=(255, 255, 255), font=font)
+        draw.text((20, 60), f"Frame: {frame_idx+1}/{total_frames}", fill=(255, 255, 255), font=font)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        draw.text((20, 100), f"Time: {timestamp}", fill=(255, 255, 255), font=font)
+        processed_frame = np.array(img)
+        return processed_frame, False, 0.0, []
+
     # Convert frame to RGB for PIL
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     pil_image = Image.fromarray(rgb_frame)
@@ -368,6 +397,34 @@ def display_video_with_yolo(video_path, width=None):
     # Create containers for the video and progress
     video_container = st.empty()
     progress_bar = st.progress(0)
+
+    # Check if OpenCV is available
+    if not OPENCV_AVAILABLE:
+        # Display a message and a simulated video
+        st.warning("OpenCV is not available. Using fallback mode with simulated video.")
+
+        # Create a simulated video
+        num_frames = 50
+        for i in range(num_frames):
+            # Update progress
+            progress_bar.progress(i / num_frames)
+
+            # Create a simulated frame
+            img = Image.new('RGB', (640, 480), color=(30, 30, 30))
+            draw = ImageDraw.Draw(img)
+            font = ImageFont.load_default()
+            draw.text((20, 20), f"Camera Feed: {os.path.basename(video_path)}", fill=(255, 255, 255), font=font)
+            draw.text((20, 60), f"Frame: {i+1}/{num_frames}", fill=(255, 255, 255), font=font)
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            draw.text((20, 100), f"Time: {timestamp}", fill=(255, 255, 255), font=font)
+
+            # Display the frame
+            video_container.image(np.array(img), caption=f"Video feed (simulated)", width=width)
+            time.sleep(0.1)
+
+        # Complete progress
+        progress_bar.progress(1.0)
+        return
 
     # Try to find crash videos if the specified path doesn't exist
     if not os.path.exists(video_path):

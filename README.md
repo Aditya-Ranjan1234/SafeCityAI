@@ -175,6 +175,8 @@ The application follows a modular architecture with clear separation of concerns
 
 ## 🚀 Usage
 
+### Local Development
+
 1. Run the Streamlit application:
    ```bash
    streamlit run app.py
@@ -185,12 +187,44 @@ The application follows a modular architecture with clear separation of concerns
    http://localhost:8501
    ```
 
+### Streamlit Cloud Deployment
+
+To deploy on Streamlit Cloud and avoid the `libGL.so.1` error:
+
+1. Make sure your `requirements.txt` file includes all necessary dependencies.
+
+2. The application has built-in fallback mechanisms to handle missing OpenCV dependencies.
+
+3. If you encounter the `libGL.so.1` error, you can install the required system packages on your server:
+   ```bash
+   # For Ubuntu/Debian
+   apt-get update && apt-get install -y libgl1-mesa-glx libglib2.0-0
+
+   # For Amazon Linux/CentOS
+   yum update -y && yum install -y mesa-libGL
+   ```
+
+4. Alternatively, use the provided Dockerfile for containerized deployment:
+   ```bash
+   # Build and run using Docker
+   docker build -t safecityai .
+   docker run -p 8501:8501 safecityai
+   ```
+
+5. Access the application at:
+   ```
+   http://localhost:8501
+   ```
+
 ## 📁 Project Structure
 
 ```
 ├── app.py                      # Main Streamlit application
 ├── sample.py                    # Standalone crash detection interface
 ├── requirements.txt            # Python dependencies
+├── Dockerfile                   # Docker configuration for containerized deployment
+├── docker-compose.yml           # Docker Compose configuration for easy deployment
+├── WORKFLOW.md                  # Detailed workflow documentation
 ├── .env                        # Environment variables (API keys)
 ├── src/                        # Source code
 │   ├── components/             # UI components
